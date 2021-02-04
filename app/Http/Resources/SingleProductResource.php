@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProductResource extends JsonResource
+class SingleProductResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,13 +16,16 @@ class ProductResource extends JsonResource
     {
         return [
             'name' => $this->name,
+            'description' => $this->detail,
             'price' => $this->price,
+            'stock' => $this->stock == 0? 'Out of Stock':$this->stock,
             'discount' =>$this->discount,
+            'totalPrice' => round((1 - $this->discount/100) * $this->price,2),
             // 17/100 = 0.17
             // 1-0.17 = ans * 300
             'rating' => $this->reviews->count() > 0 ? round($this->reviews->sum('star')/$this->reviews->count(),2):'No Rating Yet',
             'href' =>[
-                'link' => route('products.show', $this->id)
+                'reviews' =>route('review.index', $this->id)
             ]
         ];
     }
