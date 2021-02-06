@@ -90,7 +90,7 @@ class ProductController extends Controller
         $product->update($request->all());
         return response([
             'data' => new SingleProductResource($product)
-        ],Response::HTTP_CREATED);
+        ],Response::HTTP_OK);
     }
 
     /**
@@ -101,6 +101,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+        return response(null,Response::HTTP_NO_CONTENT);
     }
+    
 }
