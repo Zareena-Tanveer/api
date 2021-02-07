@@ -3,7 +3,10 @@
 namespace App\Exceptions;
 
 use Exception;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -46,6 +49,22 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        // https://laravel.com/api/5.5/Illuminate/Http/Concerns/InteractsWithContentTypes.html
+        // bool expectsJson() returns either true or false
+        // Determine if the current request probably expects a JSON response.
+        if($request->expectsJson()){
+            if ($exception instanceof ModelNotFoundException) {
+                return response()->json([
+                    'errors' => 'Model Not Found'
+                ],Response::HTTP_NOT_FOUND);
+             }
+            if($exception instanceof NotFoundHttpException){
+                return response()->json([
+                    'errors' => 'Incorrect Route'
+                ],Response::HTTP_NOT_FOUND);
+            }
+        }
+        dd($exception);
         return parent::render($request, $exception);
     }
 }
